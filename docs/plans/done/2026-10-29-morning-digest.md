@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Morning digest
@@ -77,3 +78,27 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Blocked by | Worker | Closed |
+|---|-------|-----------|--------|--------|
+| 1 | Digest types: `DigestRow` and the `readNight` signature | — | claude-code · claude-opus-5 · xhigh | 2026-10-29 |
+| 2 | Run log reader: `readNight` | #1 | claude-code · claude-opus-5 · high | 2026-10-29 |
+| 3 | Digest page: `GET /digest/:night` | #1 | claude-code · sonnet · default | 2026-10-29 |
+| 4 | Digest JSON: `GET /api/digest/:night` | #1 | claude-code · sonnet · default | 2026-10-29 |
+| 5 | Status board links each night to its digest | #1 | claude-code · sonnet · default | 2026-10-29 |
+| 6 | Route tests for the digest page and JSON | #1, #3, #4 | claude-code · sonnet · default | 2026-10-29 |
+| 7 | Preview for review | #3 | claude-code · claude-opus-5 · xhigh | 2026-10-29 |
+| 8 | Clean up: take the marker off and file the plan | #7 | claude-code · claude-opus-5 · xhigh | 2026-10-29 |
+
+Sections 2a to 2d were written by four workers at once, which is what committing
+`src/digest/types.ts` ahead of the reader bought. Their done conditions still needed the reader,
+so they started together and finished in order.
+
+The preview never entered the repo: it is generated at deploy time and uploaded as a Pages
+artifact, so taking the marker off was a re-run rather than a rewrite of history (ADR 0003).
+
+Issue #7 was closed once before the reviewer had read the preview, and reopened. Sending a link
+is not the same as it being read, and `AGENTS.md` is the rule that caught it: an issue closes
+only when its "Done when" holds.
