@@ -1,0 +1,61 @@
+# Publishes one rig page as a preview on GitHub Pages.
+#
+# The page is generated here and uploaded as a Pages artifact, so no preview is ever committed:
+# ADR 0003 keeps previews out of the repo, because a file in git history can never have its lane
+# marker taken off again.
+#
+# The marker is a run-time input, not a stored value. Run with the marker to publish the preview
+# for review; run again with it blank to take the marker off the same link (ADR 0003, plan § 4).
+name: preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      marker:
+        description: 'LANE_MARKER for the banner. Leave blank to publish with no marker.'
+        required: false
+        default: ''
+      route:
+        description: 'Which page to save.'
+        required: false
+        default: '/digest/2026-10-28'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Save the page
+        env:
+          LANE_ID: lane-07
+          LANE_MARKER: ${{ inputs.marker }}
+        run: npx tsx scripts/save-page.ts "${{ inputs.route }}" preview/index.html
+
+      - name: Show what is in the banner
+        run: grep -o 'class="marker">[^<]*' preview/index.html || true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: preview
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
